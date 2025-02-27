@@ -35,4 +35,9 @@ public class CheckObject : MonoBehaviour
             Debug.Log("Выбран объект в CheckObject (для установки): " + ARobjects[index].name);
         }
     }
+    public void MakePlacedPrefabNull()
+    {
+        placeOnPlane.placedPrefab = null;
+        Destroy(placeOnPlane.placedPrefab);
+    }
 }

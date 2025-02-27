@@ -7,6 +7,7 @@ using UnityEngine.XR.ARFoundation.Samples;
 public class ObjectManager : MonoBehaviour
 {
     public PlaceOnPlane placeOnPlane;
+    [SerializeField] CheckObject checkObject;
     private List<GameObject> placedObjects = new List<GameObject>();
     private GameObject selectedObject = null; // Выбранный объект для удаления
 
@@ -15,8 +16,10 @@ public class ObjectManager : MonoBehaviour
         GameObject spawnedObject = placeOnPlane.GetSpawnedObject();
         if (spawnedObject != null)
         {
-            placedObjects.Add(spawnedObject.transform.GetChild(0).gameObject);
+            //placedObjects.Add(spawnedObject.transform.GetChild(0).gameObject);
+            placedObjects.Add(spawnedObject);
             placeOnPlane.spawnedObject = null; // Готовим место для нового объекта
+            checkObject.MakePlacedPrefabNull();
         }
     }
 
