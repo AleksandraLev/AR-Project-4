@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.XR.ARFoundation.Samples;
@@ -14,7 +15,7 @@ public class ObjectManager : MonoBehaviour
         GameObject spawnedObject = placeOnPlane.GetSpawnedObject();
         if (spawnedObject != null)
         {
-            placedObjects.Add(spawnedObject);
+            placedObjects.Add(spawnedObject.transform.GetChild(0).gameObject);
             placeOnPlane.spawnedObject = null; // Готовим место для нового объекта
         }
     }
@@ -49,7 +50,7 @@ public class ObjectManager : MonoBehaviour
     {
         if (selectedObject != null)
         {
-            //placedObjects.Remove(selectedObject);
+            placedObjects.Remove(selectedObject);
             Destroy(selectedObject);
             selectedObject = null;
             Debug.Log("Объект удален.");
