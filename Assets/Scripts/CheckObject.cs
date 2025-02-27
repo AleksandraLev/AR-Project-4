@@ -32,7 +32,7 @@ public class CheckObject : MonoBehaviour
         {
             // Меняем Prefab в компоненте PlaceOnPlane
             placeOnPlane.placedPrefab = ARobjects[index];
-            Debug.Log("Выбран объект: " + ARobjects[index].name);
+            Debug.Log("Выбран объект в CheckObject (для установки): " + ARobjects[index].name);
         }
     }
 }

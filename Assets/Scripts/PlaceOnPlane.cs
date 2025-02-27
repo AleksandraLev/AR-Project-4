@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.ARSubsystems;
 
@@ -17,6 +18,11 @@ namespace UnityEngine.XR.ARFoundation.Samples
         [SerializeField]
         [Tooltip("Instantiates this prefab on a plane at the touch location.")]
         GameObject m_PlacedPrefab;
+
+        public GameObject spawnedObject { get; set; }
+        bool m_Pressed;
+
+        //public GameObject spawnedObject { get; private set; }
 
         /// <summary>
         /// The prefab to instantiate on touch.
@@ -54,9 +60,6 @@ namespace UnityEngine.XR.ARFoundation.Samples
         /// <summary>
         /// The object instantiated as a result of a successful raycast intersection with a plane.
         /// </summary>
-        public GameObject spawnedObject { get; private set; }
-
-        bool m_Pressed;
 
         protected override void Awake()
         {
@@ -67,7 +70,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
         void Update()
         {
 
-            if (Pointer.current == null || m_Pressed == false)
+            if (Pointer.current == null || m_Pressed == false || EventSystem.current.IsPointerOverGameObject())
                 return;
 
             var touchPosition = Pointer.current.position.ReadValue();
@@ -96,6 +99,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 spawnedObject.transform.rotation = Quaternion.LookRotation(directionToCamera);
             }
         }
+
+        public GameObject GetSpawnedObject() => spawnedObject;
 
         protected override void OnPress(Vector3 position) => m_Pressed = true;
 
