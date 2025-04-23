@@ -9,7 +9,7 @@ public class ObjectManager : MonoBehaviour
     public PlaceOnPlane placeOnPlane;
     private CheckObject checkObject;
     private List<GameObject> placedObjects = new List<GameObject>();
-    private GameObject selectedObject = null; // Выбранный объект для удаления
+    private GameObject selectedObject = null; // ????????? ?????? ??? ????????
 
     private void Start()
     {
@@ -22,14 +22,14 @@ public class ObjectManager : MonoBehaviour
         {
             //placedObjects.Add(spawnedObject.transform.GetChild(0).gameObject);
             placedObjects.Add(spawnedObject);
-            placeOnPlane.spawnedObject = null; // Готовим место для нового объекта
+            placeOnPlane.spawnedObject = null; // ??????? ????? ??? ?????? ???????
             checkObject.MakePlacedPrefabNull();
         }
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // Проверяем нажатие
+        if (Input.GetMouseButtonDown(0)) // ????????? ???????
         {
             SelectObject();
         }
@@ -37,7 +37,7 @@ public class ObjectManager : MonoBehaviour
 
     private void SelectObject()
     {
-        if (EventSystem.current.IsPointerOverGameObject()) // Игнорируем UI
+        if (EventSystem.current.IsPointerOverGameObject()) // ?????????? UI
             return;
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -48,7 +48,7 @@ public class ObjectManager : MonoBehaviour
             if (placedObjects.Contains(hit.collider.gameObject))
             {
                 selectedObject = hit.collider.gameObject;
-                Debug.Log("Выбран объект в ObjectManager (для удаления): " + selectedObject.name);
+                Debug.Log("?????? ?????? ? ObjectManager (??? ????????): " + selectedObject.name);
             }
         }
     }
@@ -60,7 +60,7 @@ public class ObjectManager : MonoBehaviour
             placedObjects.Remove(selectedObject);
             Destroy(selectedObject);
             selectedObject = null;
-            Debug.Log("Объект удален.");
+            Debug.Log("?????? ??????.");
         }
         else if(placeOnPlane.spawnedObject != null)
         {

@@ -15,7 +15,14 @@ public class CheckObject : MonoBehaviour
     void Start()
     {
         // Найдем компонент PlaceOnPlane в нужном объекте
-        placeOnPlane = XROrigin.GetComponent<PlaceOnPlane>();
+        if (XROrigin.TryGetComponent<PlaceOnPlane>(out placeOnPlane))
+        {
+            Debug.Log("Компонент PlaceOnPlane успешно получен, можно с ним работать");  
+        }
+        else
+        {
+            Debug.LogWarning("Компонент PlaceOnPlane не найден на объекте XROrigin");
+        }
 
         // Подписываемся на события кнопок
         for (int i = 0; i < Buttons.Count; i++)
@@ -38,6 +45,6 @@ public class CheckObject : MonoBehaviour
     public void MakePlacedPrefabNull()
     {
         placeOnPlane.placedPrefab = null;
-        Destroy(placeOnPlane.placedPrefab);
+        // Destroy(placeOnPlane.placedPrefab);
     }
 }

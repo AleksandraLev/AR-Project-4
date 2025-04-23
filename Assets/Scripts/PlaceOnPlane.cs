@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.ARSubsystems;
+using System;
 
 namespace UnityEngine.XR.ARFoundation.Samples
 {
@@ -33,11 +34,15 @@ namespace UnityEngine.XR.ARFoundation.Samples
             set
             {
                 m_PlacedPrefab = value;
+                
+                if (m_PlacedPrefab == null)
+                    return;
 
                 // Когда меняем префаб, нужно создать новый объект на месте старого, если он есть
                 if (spawnedObject != null)
                 {
                     Destroy(spawnedObject); // Удаляем старый объект
+                    spawnedObject = null; // Возможно, это не нужно.
                 }
 
                 // Создаем новый объект на текущем месте
@@ -69,34 +74,46 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         void Update()
         {
-
-            if (Pointer.current == null || m_Pressed == false || EventSystem.current.IsPointerOverGameObject())
-                return;
-
-            var touchPosition = Pointer.current.position.ReadValue();
-
-            if (m_RaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
+            try
             {
-                // Raycast hits are sorted by distance, so the first one
-                // will be the closest hit.
-                var hitPose = s_Hits[0].pose;
+                if (Pointer.current == null || m_Pressed == false || EventSystem.current.IsPointerOverGameObject())
+                    return;
 
-                if (spawnedObject == null)
+                var touchPosition = Pointer.current.position.ReadValue();
+
+                if (m_RaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
                 {
-                    spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
-                }
-                else
-                {
-                    spawnedObject.transform.position = hitPose.position;
-                }
-                // Получаем позицию камеры
-                Vector3 cameraPosition = Camera.main.transform.position;
+                    // Raycast hits are sorted by distance, so the first one
+                    // will be the closest hit.
+                    var hitPose = s_Hits[0].pose;
 
-                // Вычисляем направление к камере, игнорируя высоту (Y)
-                Vector3 directionToCamera = new Vector3(cameraPosition.x - hitPose.position.x, 0, cameraPosition.z - hitPose.position.z);
+                    if (spawnedObject == null)
+                    {
+                        if (m_PlacedPrefab == null)
+                        {
+                            Debug.LogWarning("Попытка инстанцировать null-префаб в Update()");
+                            return;
+                        }
+                    
+                        spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+                    }
+                    else
+                    {
+                        spawnedObject.transform.position = hitPose.position;
+                    }
+                    // Получаем позицию камеры
+                    Vector3 cameraPosition = Camera.main.transform.position;
 
-                // Разворачиваем объект к камере (только по Y)
-                spawnedObject.transform.rotation = Quaternion.LookRotation(directionToCamera);
+                    // Вычисляем направление к камере, игнорируя высоту (Y)
+                    Vector3 directionToCamera = new Vector3(cameraPosition.x - hitPose.position.x, 0, cameraPosition.z - hitPose.position.z);
+
+                    // Разворачиваем объект к камере (только по Y)
+                    spawnedObject.transform.rotation = Quaternion.LookRotation(directionToCamera);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[Update Exception]: {ex}");
             }
         }
 
