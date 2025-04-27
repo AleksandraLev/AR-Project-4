@@ -4,47 +4,65 @@ using UnityEngine.XR.ARFoundation.Samples;
 
 public class ShowPlane : MonoBehaviour
 {
-    public ARPlaneManager arPlaneManager;
-    public float scanCompleteDelay = 5f;
-
-    private float timer = 0f;
-    private int lastPlaneCount = 0;
-    private bool scanCompleted = false;
-
-    void Update()
+    private PlaceOnPlane placeOnPlane;  // Компонент, который управляет PlacedPrefab
+    [SerializeField] GameObject XROrigin;
+    private GameObject Plane;
+    private ARPlaneManager arPlaneManager;
+    void Start()
     {
-        if (scanCompleted) return;
-
-        int currentPlaneCount = arPlaneManager.trackables.count;
-
-        if (currentPlaneCount == lastPlaneCount)
+        // Найдем компонент PlaceOnPlane в нужном объекте
+        if (XROrigin.TryGetComponent<PlaceOnPlane>(out placeOnPlane))
         {
-            timer += Time.deltaTime;
-            if (timer >= scanCompleteDelay)
-            {
-                scanCompleted = true;
-                HidePlanes();
-            }
+            Debug.Log("Компонент PlaceOnPlane успешно получен, можно с ним работать");
+            placeOnPlane.OnFirstObjectPlaced += DeactivatePlane;
         }
         else
         {
-            timer = 0f;
-            lastPlaneCount = currentPlaneCount;
+            Debug.LogWarning("Компонент PlaceOnPlane не найден на объекте XROrigin");
+        }
+        if (XROrigin.TryGetComponent<ARPlaneManager>(out arPlaneManager))
+        {
+            Debug.Log("Компонент ARPlaneManager успешно получен, можно с ним работать");
+        }
+        else
+        {
+            Debug.LogWarning("Компонент ARPlaneManager не найден на объекте XROrigin");
         }
     }
 
-    void HidePlanes()
+    void OnDisable()
     {
+        if (placeOnPlane != null)
+            placeOnPlane.OnFirstObjectPlaced -= DeactivatePlane;
+    }
+
+    void DeactivatePlane()
+    {
+        arPlaneManager.enabled = false;
         foreach (var plane in arPlaneManager.trackables)
         {
-            var meshRenderer = plane.GetComponent<MeshRenderer>();
-            var visualizer = plane.GetComponent<ARPlaneMeshVisualizer>();
-
-            if (meshRenderer != null)
-                meshRenderer.enabled = false;
-
-            if (visualizer != null)
-                visualizer.enabled = false;
+            plane.gameObject.SetActive(false);
         }
+    }
+    
+    void OnPlanesChanged(ARPlanesChangedEventArgs args)
+    {
+        foreach (var added in args.added)
+        {
+            HidePlane(added);
+        }
+    }
+
+    void HidePlane(ARPlane plane)
+    {
+        // Отключаем визуализацию
+        var meshRenderer = plane.GetComponent<MeshRenderer>();
+        if (meshRenderer != null)
+            meshRenderer.enabled = false;
+
+        // Иногда используется ARPlaneMeshVisualizer — его тоже можно отключить
+        var visualizer = plane.GetComponent<ARPlaneMeshVisualizer>();
+        if (visualizer != null)
+            visualizer.enabled = false;
     }
 }

@@ -22,6 +22,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         public GameObject spawnedObject { get; set; }
         bool m_Pressed;
+        public event Action OnFirstObjectPlaced;
+
 
         //public GameObject spawnedObject { get; private set; }
 
@@ -78,6 +80,12 @@ namespace UnityEngine.XR.ARFoundation.Samples
             {
                 if (Pointer.current == null || m_Pressed == false || EventSystem.current.IsPointerOverGameObject())
                     return;
+                if (Input.touchCount > 0) // Для мобильных устройств
+                {
+                    Touch touch = Input.GetTouch(0);
+                    if (EventSystem.current.IsPointerOverGameObject(touch.fingerId)) // Проверка на UI для тача
+                        return;
+                }
 
                 var touchPosition = Pointer.current.position.ReadValue();
 
@@ -109,6 +117,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
                     // Разворачиваем объект к камере (только по Y)
                     spawnedObject.transform.rotation = Quaternion.LookRotation(directionToCamera);
+                    OnFirstObjectPlaced?.Invoke();
                 }
             }
             catch (Exception ex)

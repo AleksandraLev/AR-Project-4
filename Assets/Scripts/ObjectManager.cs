@@ -37,8 +37,14 @@ public class ObjectManager : MonoBehaviour
 
     private void SelectObject()
     {
-        if (EventSystem.current.IsPointerOverGameObject()) // ?????????? UI
+        if (EventSystem.current.IsPointerOverGameObject()) // Игнорирование UI
             return;
+        if (Input.touchCount > 0) // Для мобильных устройств
+        {
+            Touch touch = Input.GetTouch(0);
+            if (EventSystem.current.IsPointerOverGameObject(touch.fingerId)) // Проверка на UI для тача
+                return;
+        }
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
